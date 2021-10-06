@@ -2,6 +2,7 @@ import express, { Application } from 'express'
 import cors from 'cors'
 import errorMiddleware from '../middleware/error.middleware'
 import loggerMiddleware from '../middleware/logger.middleware'
+import DB from './db.config'
 
 class Server {
   private app: Application
@@ -11,7 +12,16 @@ class Server {
     this.app = express()
     this.port = process.env.PORT || '8080'
 
+    // Connection to db
+    this.dbconnection()
+
+    // Sever configuration middlewares
     this.configMiddlewares()
+  }
+
+  async dbconnection(): Promise<void> {
+    const db = new DB()
+    await db.connection()
   }
 
   configMiddlewares(): void {
