@@ -1,5 +1,7 @@
 import express, { Application } from 'express'
 import cors from 'cors'
+import errorMiddleware from 'middleware/error.middleware'
+import loggerMiddleware from 'middleware/logger.middleware'
 
 class Server {
   private app: Application
@@ -13,12 +15,16 @@ class Server {
   }
 
   configMiddlewares(): void {
+    // Simple Logging
+    this.app.use(loggerMiddleware)
     // CORS
     this.app.use(cors())
     // BodyParse
     this.app.use(express.json())
     // Public Folder
     this.app.use(express.static('public'))
+    // Simple Error Handling
+    this.app.use(errorMiddleware)
   }
 
   listen(): void {
