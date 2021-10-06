@@ -4,6 +4,8 @@
   "description": "backend service for iacenter final project",
   "main": "index.ts",
   "scripts": {
+    "start": "nodemon",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sebastian Audetat (Grufty295)",
