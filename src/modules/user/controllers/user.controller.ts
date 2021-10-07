@@ -1,12 +1,41 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Request, Response } from 'express'
+import { FilterQuery, CustomLabels, PaginateOptions } from 'mongoose'
 
 import Crypto from '../../../helpers/cryptography/cryptography.helper'
+import { IUser } from '../interfaces/user.interface'
 import User from '../models/user.model'
 
 const crypto = new Crypto()
 
-// const getAllUsers = (req: Request, res: Response) => {}
+const getAllUsers = async (req: Request, res: Response) => {
+  const { limit = 5, page = 1, query = '' } = req.query
+
+  const condition: FilterQuery<IUser> = {
+    $and: [
+      {
+        $or: [
+          { name: { $regex: query.toString() } },
+          { email: { $regex: query.toString() } },
+        ],
+      },
+    ],
+  }
+
+  const customLabels: CustomLabels = {
+    totalDocs: 'userCount',
+    docs: 'usersList',
+  }
+
+  const options: PaginateOptions = {
+    limit: parseInt(limit.toString()),
+    page: parseInt(page.toString()),
+    customLabels,
+  }
+
+  const users = await User.paginate(condition, options)
+  res.status(200).json({ ok: true, users })
+}
 
 // const getOneUser = (req: Request, res: Response) => {}
 
@@ -44,7 +73,7 @@ const updateUser = async (req: Request, res: Response) => {
 // const deleteUser = (req: Request, res: Response) => {}
 
 export default {
-  //   getAllUsers,
+  getAllUsers,
   //   getOneUser,
   addUser,
   updateUser,
