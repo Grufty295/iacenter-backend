@@ -23,6 +23,11 @@ const UserSchema = new Schema<IUser>(
       default: Roles.USER_ROLE,
       enum: [...Object.values(Roles)],
     },
+    state: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
   },
   { timestamps: true },
 )

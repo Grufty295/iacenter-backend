@@ -14,7 +14,7 @@ const existingEmail = async (email = ''): Promise<void> => {
 }
 
 const existingUser = async (id: ObjectId): Promise<void> => {
-  const userExists = await User.findById({ _id: id })
+  const userExists = await User.findById({ _id: id, state: true })
   if (!userExists) throw new Error('This user id does not exists')
 }
 

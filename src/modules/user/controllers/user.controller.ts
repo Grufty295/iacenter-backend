@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { Request, Response } from 'express'
 import { FilterQuery, CustomLabels, PaginateOptions } from 'mongoose'
 
@@ -19,6 +21,7 @@ const getAllUsers = async (req: Request, res: Response) => {
           { email: { $regex: query.toString() } },
         ],
       },
+      { state: true },
     ],
   }
 
@@ -53,7 +56,7 @@ const addUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { _id, password, ...rest } = req.body
 
   if (password) {
@@ -70,12 +73,22 @@ const updateUser = async (req: Request, res: Response) => {
   })
 }
 
-// const deleteUser = (req: Request, res: Response) => {}
+const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  const deletedUser = await User.findByIdAndUpdate(id, { state: false })
+
+  res.json({
+    ok: true,
+    msg: `User with ID: ${id} succesfully deleted`,
+    user: deletedUser,
+  })
+}
 
 export default {
   getAllUsers,
   //   getOneUser,
   addUser,
   updateUser,
-  //   deleteUser,
+  deleteUser,
 }

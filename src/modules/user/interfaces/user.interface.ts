@@ -3,6 +3,7 @@ export interface IUser {
   email: string
   password: string
   role: string
+  state: boolean
   createdAt: Date
   updatedAt: Date
 }

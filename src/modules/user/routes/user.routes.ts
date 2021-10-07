@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
 
-import fieldValidation from '../../../middleware/fieldValidation.middleware'
+import fieldValidation from '../../../middlewares/fieldValidation.middleware'
 
 import {
   existingEmail,
@@ -39,6 +39,14 @@ router.put(
   ],
   userController.updateUser,
 )
-router.delete('/id')
+router.delete(
+  '/:id',
+  [
+    check('id', 'No es un ID válido').isMongoId(),
+    check('id').custom(existingUser),
+    fieldValidation,
+  ],
+  userController.deleteUser,
+)
 
 export default router

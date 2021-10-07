@@ -1,8 +1,8 @@
 import express, { Application } from 'express'
 
 import cors from 'cors'
-import errorMiddleware from '../middleware/error.middleware'
-import loggerMiddleware from '../middleware/logger.middleware'
+import errorMiddleware from '../middlewares/error.middleware'
+import loggerMiddleware from '../middlewares/logger.middleware'
 
 import DB from './db.config'
 
