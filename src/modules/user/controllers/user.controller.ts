@@ -22,7 +22,24 @@ const addUser = async (req: Request, res: Response) => {
   res.json({ ok: true, msg: 'User added succesfully', user: newUser })
 }
 
-// const updateUser = (req: Request, res: Response) => {}
+const updateUser = async (req: Request, res: Response) => {
+  const { id } = req.params
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { _id, password, ...rest } = req.body
+
+  if (password) {
+    // Encrypt password
+    rest.password = await crypto.encrypt(password)
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(id, rest)
+
+  res.json({
+    ok: true,
+    msg: `User with ID: ${id} succesfully updated`,
+    user: updatedUser,
+  })
+}
 
 // const deleteUser = (req: Request, res: Response) => {}
 
@@ -30,6 +47,6 @@ export default {
   //   getAllUsers,
   //   getOneUser,
   addUser,
-  //   updateUser,
+  updateUser,
   //   deleteUser,
 }

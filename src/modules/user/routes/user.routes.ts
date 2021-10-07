@@ -5,6 +5,7 @@ import fieldValidation from '../../../middleware/fieldValidation.middleware'
 
 import {
   existingEmail,
+  existingUser,
   isValidRole,
 } from '../../../helpers/modelValidators/modelValidators.helper'
 
@@ -28,7 +29,16 @@ router.post(
   ],
   userController.addUser,
 )
-router.put('/:id')
+router.put(
+  '/:id',
+  [
+    check('id', 'Invalid ID').isMongoId(),
+    check('id').custom(existingUser),
+    check('role').custom(isValidRole),
+    fieldValidation,
+  ],
+  userController.updateUser,
+)
 router.delete('/id')
 
 export default router
