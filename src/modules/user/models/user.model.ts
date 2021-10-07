@@ -2,7 +2,7 @@
 import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-import { IUser } from '../interfaces/user.interface'
+import IUser from '../interfaces/user.interface'
 import { Roles } from '../interfaces/role.interface'
 
 const UserSchema = new Schema<IUser>(
@@ -34,8 +34,12 @@ const UserSchema = new Schema<IUser>(
 UserSchema.plugin(mongoosePaginate)
 
 UserSchema.methods.toJSON = function () {
-  const { __v, password, ...publicUser } = this.toObject()
-  return publicUser
+  const { __v, _id, password, ...publicUser } = this.toObject()
+
+  return {
+    uid: _id,
+    ...publicUser,
+  }
 }
 
 export default model<IUser>('User', UserSchema)

@@ -7,12 +7,14 @@ import loggerMiddleware from '../middlewares/logger.middleware'
 import DB from './db.config'
 
 import userRoutes from '../modules/user/routes/user.routes'
+import authRoutes from '../modules/auth/routes/auth.routes'
 
 class Server {
   private app: Application
   private port: string
   private apiPaths = {
     users: '/api/v1/users',
+    auth: '/api/v1/auth',
   }
 
   constructor() {
@@ -36,6 +38,7 @@ class Server {
 
   routes(): void {
     this.app.use(this.apiPaths.users, userRoutes)
+    this.app.use(this.apiPaths.auth, authRoutes)
   }
 
   configMiddlewares(): void {

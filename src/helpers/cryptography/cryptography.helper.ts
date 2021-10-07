@@ -16,4 +16,4 @@ class Crypto {
   }
 }
 
-export default Crypto
+export default new Crypto()

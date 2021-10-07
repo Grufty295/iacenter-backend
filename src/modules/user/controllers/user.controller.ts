@@ -5,10 +5,8 @@ import { Request, Response } from 'express'
 import { FilterQuery, CustomLabels, PaginateOptions } from 'mongoose'
 
 import Crypto from '../../../helpers/cryptography/cryptography.helper'
-import { IUser } from '../interfaces/user.interface'
+import IUser from '../interfaces/user.interface'
 import User from '../models/user.model'
-
-const crypto = new Crypto()
 
 const getAllUsers = async (req: Request, res: Response) => {
   const { limit = 5, page = 1, query = '' } = req.query
@@ -47,7 +45,7 @@ const addUser = async (req: Request, res: Response) => {
   const newUser = new User({ name, email, password, role })
 
   // Encrypt password
-  newUser.password = await crypto.encrypt(password)
+  newUser.password = await Crypto.encrypt(password)
 
   await newUser.save()
 
@@ -61,7 +59,7 @@ const updateUser = async (req: Request, res: Response) => {
 
   if (password) {
     // Encrypt password
-    rest.password = await crypto.encrypt(password)
+    rest.password = await Crypto.encrypt(password)
   }
 
   const updatedUser = await User.findByIdAndUpdate(id, rest)
