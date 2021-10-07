@@ -1,12 +1,19 @@
 import express, { Application } from 'express'
+
 import cors from 'cors'
 import errorMiddleware from '../middleware/error.middleware'
 import loggerMiddleware from '../middleware/logger.middleware'
+
 import DB from './db.config'
+
+import userRoutes from '../modules/user/routes/user.routes'
 
 class Server {
   private app: Application
   private port: string
+  private apiPaths = {
+    users: '/api/v1/users',
+  }
 
   constructor() {
     this.app = express()
@@ -17,11 +24,18 @@ class Server {
 
     // Sever configuration middlewares
     this.configMiddlewares()
+
+    // Server routes definition
+    this.routes()
   }
 
   async dbconnection(): Promise<void> {
     const db = new DB()
     await db.connection()
+  }
+
+  routes(): void {
+    this.app.use(this.apiPaths.users, userRoutes)
   }
 
   configMiddlewares(): void {
