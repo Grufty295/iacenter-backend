@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import Crypto from '../../../helpers/cryptography/cryptography.helper'
+import CryptographyServices from '../../common/services/cryptography.services'
 import jwtHelper from '../../../helpers/jwt/jwt.helper'
 
 import User from '../../user/models/user.model'
@@ -20,7 +20,10 @@ const login = async (req: Request, res: Response): Promise<any> => {
         .status(400)
         .json({ ok: false, msg: 'Invalid email and/or password - state' })
 
-    const validPassword = await Crypto.decrypt(password, existingUser.password)
+    const validPassword = await CryptographyServices.decrypt(
+      password,
+      existingUser.password,
+    )
     if (!validPassword)
       return res
         .status(400)

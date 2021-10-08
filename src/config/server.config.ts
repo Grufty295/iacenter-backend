@@ -6,16 +6,13 @@ import loggerMiddleware from '../middlewares/logger.middleware'
 
 import DB from './db.config'
 
-import userRoutes from '../modules/user/routes/user.routes'
-import authRoutes from '../modules/auth/routes/auth.routes'
+import { CommonRoutesConfig } from '../modules/common/common.routes.config'
+import { UserRoutes } from '../modules/user/user.routes.config'
 
 class Server {
   private app: Application
   private port: string
-  private apiPaths = {
-    users: '/api/v1/users',
-    auth: '/api/v1/auth',
-  }
+  private routes: Array<CommonRoutesConfig> = []
 
   constructor() {
     this.app = express()
@@ -28,7 +25,7 @@ class Server {
     this.configMiddlewares()
 
     // Server routes definition
-    this.routes()
+    this.configRoutes()
   }
 
   async dbconnection(): Promise<void> {
@@ -36,9 +33,8 @@ class Server {
     await db.connection()
   }
 
-  routes(): void {
-    this.app.use(this.apiPaths.users, userRoutes)
-    this.app.use(this.apiPaths.auth, authRoutes)
+  configRoutes(): void {
+    this.routes.push(new UserRoutes(this.app))
   }
 
   configMiddlewares(): void {
@@ -57,6 +53,9 @@ class Server {
   listen(): void {
     this.app.listen(this.port, () => {
       console.log('Server running on port:', this.port)
+      this.routes.forEach((route: CommonRoutesConfig) => {
+        console.log(`Routes configured for ${route.getName()}`)
+      })
     })
   }
 }

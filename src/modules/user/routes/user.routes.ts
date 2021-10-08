@@ -1,52 +1,64 @@
 import { Router } from 'express'
-import { check } from 'express-validator'
+import { body, param } from 'express-validator'
 
-import fieldValidation from '../../../middlewares/fieldValidation.middleware'
+import UserController from '../controllers/user.controller'
 
-import {
-  existingEmail,
-  existingUser,
-  isValidRole,
-} from '../../../helpers/modelValidators/modelValidators.helper'
-
-import userController from '../controllers/user.controller'
+import BodyValidationMiddleware from '../../common/middlewares/body.validation.middleware'
+import UserMiddlewares from '../middlewares/user.middlewares'
+import CommonRoleMiddleware from '../../common/middlewares/common.role.middleware'
 
 const router = Router()
 
-router.get('/', userController.getAllUsers)
-router.get('/:id')
+// TODO: Auth validations
+
+router.get('/', UserController.getAllUsers)
+
 router.post(
   '/',
   [
-    check('name', 'User name is required').notEmpty(),
-    check('password', 'User password must be at least 8 characters').isLength({
-      min: 8,
-    }),
-    check('email', 'Invalid email').isEmail(),
-    check('email').custom(existingEmail),
-    check('role').custom(isValidRole),
-    fieldValidation,
+    body('name', 'User name is required').notEmpty(),
+    body('password', 'User password must be at least 8 characters')
+      .isLength({
+        min: 8,
+      })
+      .trim(),
+    body('email', 'Invalid email').isEmail(),
+    BodyValidationMiddleware.validateBodyFieldsErrors,
+    UserMiddlewares.validateSameEmailDoesntExists,
+    CommonRoleMiddleware.validateRoleExists,
   ],
-  userController.addUser,
+  UserController.addUser,
 )
+
 router.put(
   '/:id',
   [
-    check('id', 'Invalid ID').isMongoId(),
-    check('id').custom(existingUser),
-    check('role').custom(isValidRole),
-    fieldValidation,
+    param('id', 'Invalid ID').isMongoId(),
+    body('name', 'Invalid User name').not().isNumeric().optional(),
+    body('password', 'User password must be at least 8 characters')
+      .isLength({
+        min: 8,
+      })
+      .trim()
+      .optional(),
+    body('email', 'Invalid email').isEmail().optional(),
+    body('role', 'Invalid role').isString().optional(),
+    BodyValidationMiddleware.validateBodyFieldsErrors,
+    UserMiddlewares.validateUserExists,
+    CommonRoleMiddleware.validateRoleExists,
+    UserMiddlewares.validateEmailUpdate,
   ],
-  userController.updateUser,
+  UserController.updateUser,
 )
+
 router.delete(
   '/:id',
   [
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom(existingUser),
-    fieldValidation,
+    param('id', 'Invalid ID').isMongoId(),
+    BodyValidationMiddleware.validateBodyFieldsErrors,
+    UserMiddlewares.validateUserExists,
   ],
-  userController.deleteUser,
+  UserController.deleteUser,
 )
 
 export default router

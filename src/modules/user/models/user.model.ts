@@ -2,8 +2,8 @@
 import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-import IUser from '../interfaces/user.interface'
-import { Roles } from '../interfaces/role.interface'
+import { IUser } from '../interfaces/user.interface'
+import { Roles } from '../../common/interfaces/common.role.enum'
 
 const UserSchema = new Schema<IUser>(
   {

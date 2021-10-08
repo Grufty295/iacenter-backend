@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 
-class Crypto {
+class CryptographyServices {
   private salt: number | string
 
   constructor() {
@@ -16,4 +16,4 @@ class Crypto {
   }
 }
 
-export default new Crypto()
+export default new CryptographyServices()
