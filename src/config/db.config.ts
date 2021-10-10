@@ -1,12 +1,12 @@
 import Mongoose from 'mongoose'
-
+import config from './values.config'
 class DB {
   private connectionUri?: string
   private database: string
 
   constructor() {
-    this.connectionUri = process.env.MONGODB_CNN
-    this.database = process.env.DB_NAME || 'test'
+    this.connectionUri = config.MONGODB_URI
+    this.database = config.DB_NAME || 'test'
   }
 
   async connection(): Promise<void> {

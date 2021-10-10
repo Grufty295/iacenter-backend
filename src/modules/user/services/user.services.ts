@@ -1,33 +1,44 @@
 import UserModel from '../models/user.model'
-import { CustomLabels, PaginateOptions, FilterQuery } from 'mongoose'
 import {
-  IUser,
-  ICreateUserModel,
-  IUpdateUserModel,
+  CustomLabels,
+  PaginateOptions,
+  FilterQuery,
+  PaginateResult,
+} from 'mongoose'
+import {
+  ICreateUserInput,
+  IUpdateUserInput,
+  IUserDoc,
 } from '../interfaces/user.interface'
+import { IPaginationOptions } from 'modules/common/interfaces/common.paginationOptions.interface'
 
 class UsersServices {
-  async addUser(userFields: ICreateUserModel) {
-    const user = new UserModel(userFields)
-    await user.save()
-    return user
+  async addUser(user: ICreateUserInput): Promise<IUserDoc> {
+    const newUser: IUserDoc = new UserModel(user)
+    await newUser.save()
+    return newUser
   }
 
-  async getUsers(limit: number, page: number, query: string) {
+  async getUsers(
+    pagination: IPaginationOptions,
+  ): Promise<PaginateResult<IUserDoc>> {
     const paginationCustomLabes: CustomLabels = {
       totalDocs: 'userCount',
       docs: 'usersList',
     }
     const paginationOptions: PaginateOptions = {
-      limit,
-      page,
+      limit: pagination.limit,
+      page: pagination.page,
       customLabels: paginationCustomLabes,
     }
 
-    const condition: FilterQuery<IUser> = {
+    const condition: FilterQuery<IUserDoc> = {
       $and: [
         {
-          $or: [{ name: { $regex: query } }, { email: { $regex: query } }],
+          $or: [
+            { name: { $regex: pagination.query } },
+            { email: { $regex: pagination.query } },
+          ],
         },
         { state: true },
       ],
@@ -38,27 +49,35 @@ class UsersServices {
     return usersList
   }
 
-  async getUserById(userId: string) {
-    const existingUser = await UserModel.findById({ _id: userId }).exec()
+  async getUserById(id: string): Promise<IUserDoc> {
+    const existingUser = await UserModel.findById({ _id: id }).orFail().exec()
     return existingUser
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<IUserDoc> {
     const existingUser = await UserModel.findOne({ email }).exec()
-    return existingUser
+    return existingUser as IUserDoc
   }
 
-  async updateUserById(userId: string, userFields: IUpdateUserModel) {
-    const existingUser = await UserModel.findByIdAndUpdate(userId, userFields, {
+  async getUserByEmailWithPassword(email: string): Promise<IUserDoc> {
+    const existingUserWithPassword = await UserModel.findOne({ email })
+      .select('_id email role password')
+      .orFail()
+      .exec()
+    return existingUserWithPassword
+  }
+
+  async updateUserById(id: string, user: IUpdateUserInput): Promise<IUserDoc> {
+    const existingUser = await UserModel.findByIdAndUpdate({ _id: id }, user, {
       new: true,
     }).exec()
 
     return existingUser
   }
 
-  async deleteUserById(userId: string) {
+  async deleteUserById(id: string): Promise<IUserDoc> {
     const existingUser = await UserModel.findByIdAndUpdate(
-      userId,
+      id,
       { state: false },
       { new: true },
     ).exec()

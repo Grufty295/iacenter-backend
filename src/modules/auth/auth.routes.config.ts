@@ -3,14 +3,14 @@ import { Application } from 'express'
 import { API_PATHS__V1 } from '../../config/apiPaths.config'
 
 import { CommonRoutesConfig } from '../common/common.routes.config'
-import UserRouter from './routes/user.routes'
+import AuthRouter from './routes/auth.routes'
 
-export class UserRoutes extends CommonRoutesConfig {
+export class AuthRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
-    super(app, 'UserRoutes')
+    super(app, 'AuthRoutes')
   }
 
   configureRoutes(): Application {
-    return this.app.use(API_PATHS__V1.USERS_PATH, UserRouter)
+    return this.app.use(API_PATHS__V1.AUTH_PATH, AuthRouter)
   }
 }

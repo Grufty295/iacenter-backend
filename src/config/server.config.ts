@@ -1,13 +1,16 @@
 import express, { Application } from 'express'
 
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import errorMiddleware from '../middlewares/error.middleware'
 import loggerMiddleware from '../middlewares/logger.middleware'
 
 import DB from './db.config'
+import config from './values.config'
 
 import { CommonRoutesConfig } from '../modules/common/common.routes.config'
 import { UserRoutes } from '../modules/user/user.routes.config'
+import { AuthRoutes } from '../modules/auth/auth.routes.config'
 
 class Server {
   private app: Application
@@ -16,7 +19,7 @@ class Server {
 
   constructor() {
     this.app = express()
-    this.port = process.env.PORT || '8080'
+    this.port = config.PORT || '8080'
 
     // Connection to db
     this.dbconnection()
@@ -35,6 +38,7 @@ class Server {
 
   configRoutes(): void {
     this.routes.push(new UserRoutes(this.app))
+    this.routes.push(new AuthRoutes(this.app))
   }
 
   configMiddlewares(): void {
@@ -42,6 +46,8 @@ class Server {
     this.app.use(loggerMiddleware)
     // CORS
     this.app.use(cors())
+    // CookieParse
+    this.app.use(cookieParser())
     // BodyParse
     this.app.use(express.json())
     // Public Folder

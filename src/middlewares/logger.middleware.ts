@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 
 function loggerMiddleware(
-  request: Request,
-  response: Response,
+  req: Request,
+  res: Response,
   next: NextFunction,
 ): void {
-  const { url, method, body, headers } = request
+  const { url, method, body, headers } = req
 
   console.info('[LOG]', { url, method, body, headers })
   next()

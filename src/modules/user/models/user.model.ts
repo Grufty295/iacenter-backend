@@ -2,10 +2,10 @@
 import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-import { IUser } from '../interfaces/user.interface'
+import { IUserDoc } from '../interfaces/user.interface'
 import { Roles } from '../../common/interfaces/common.role.enum'
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema(
   {
     name: { type: String, required: [true, 'User name is required'] },
     email: {
@@ -42,4 +42,4 @@ UserSchema.methods.toJSON = function () {
   }
 }
 
-export default model<IUser>('User', UserSchema)
+export default model<IUserDoc>('User', UserSchema)

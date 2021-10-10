@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 import UserServices from '../services/user.services'
+import { IUserDoc } from '../interfaces/user.interface'
 
 class UserMiddlewares {
   async validateSameEmailDoesntExists(
@@ -8,15 +9,18 @@ class UserMiddlewares {
     res: Response,
     next: NextFunction,
   ) {
-    const userWithExistingEmail = await UserServices.getUserByEmail(
-      req.body.email,
-    )
-    if (userWithExistingEmail) {
-      return res
-        .status(400)
-        .send({ error: 'This email is already connected to an account' })
-    } else {
-      next()
+    let userWithExistingEmail: IUserDoc
+    try {
+      userWithExistingEmail = await UserServices.getUserByEmail(req.body.email)
+      if (userWithExistingEmail) {
+        return res
+          .status(400)
+          .send({ error: 'This email is already connected to an account' })
+      } else {
+        return next()
+      }
+    } catch (err: unknown) {
+      console.log(err)
     }
   }
 
