@@ -21,13 +21,13 @@ const RefreshTokenSchema = new Schema(
   },
 )
 
-RefreshTokenSchema.virtual('isExpired').get(function (this: IRefreshTokenDoc) {
-  return Date.now() >= this.expires.getTime()
-})
+// RefreshTokenSchema.virtual('isExpired').get(function (this: IRefreshTokenDoc) {
+//   return Date.now() >= this.expires.getTime()
+// })
 
-RefreshTokenSchema.virtual('isActive').get(function (this: IRefreshTokenDoc) {
-  return !this.revokedAt && !this.isExpired
-})
+// RefreshTokenSchema.virtual('isActive').get(function (this: IRefreshTokenDoc) {
+//   return !this.revokedAt && !this.isExpired
+// })
 
 RefreshTokenSchema.methods.toJSON = function () {
   const { __v, _id, ...rest } = this.toObject()

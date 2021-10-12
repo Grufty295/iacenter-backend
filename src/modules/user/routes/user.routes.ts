@@ -5,20 +5,18 @@ import { Roles } from '../../common/interfaces/common.role.enum'
 
 import UserController from '../controllers/user.controller'
 
-import BodyValidationMiddleware from '../../common/middlewares/body.validation.middleware'
-import CommonRoleMiddleware from '../../common/middlewares/common.role.middleware'
-import JwtMiddlewares from '../../auth/middlewares/jwt.middlewares'
-import UserMiddlewares from '../middlewares/user.middlewares'
+import bodyValidationMiddleware from '../../common/middlewares/body.validation.middleware'
+import commonRoleMiddleware from '../../common/middlewares/common.role.middleware'
+import jwtMiddlewares from '../../auth/middlewares/jwt.middlewares'
+import userMiddlewares from '../middlewares/user.middlewares'
 
 const router = Router()
-
-// TODO: Auth validations
 
 router.get(
   '/',
   [
-    JwtMiddlewares.validJWTNeeded,
-    CommonRoleMiddleware.validateSpecificRoleRequired(Roles.ADMIN_ROLE),
+    jwtMiddlewares.validJWTNeeded,
+    commonRoleMiddleware.validateSpecificRoleRequired(Roles.ADMIN_ROLE),
   ],
   UserController.getAllUsers,
 )
@@ -33,9 +31,9 @@ router.post(
       })
       .trim(),
     body('email', 'Invalid email').isEmail(),
-    BodyValidationMiddleware.validateBodyFieldsErrors,
-    UserMiddlewares.validateSameEmailDoesntExists,
-    CommonRoleMiddleware.validateRoleExists,
+    bodyValidationMiddleware.validateBodyFieldsErrors,
+    userMiddlewares.validateSameEmailDoesntExists,
+    commonRoleMiddleware.validateRoleExists,
   ],
   UserController.addUser,
 )
@@ -43,17 +41,17 @@ router.post(
 router.put(
   '/:id',
   [
-    JwtMiddlewares.validJWTNeeded,
+    jwtMiddlewares.validJWTNeeded,
     param('id', 'Invalid ID').isMongoId(),
     body('name', 'Invalid User name').not().isNumeric().optional(),
     body('password', 'User cant change their password').isEmpty(),
     body('email', 'Invalid email').isEmail().optional(),
     body('role', 'Invalid role').isString().optional(),
-    BodyValidationMiddleware.validateBodyFieldsErrors,
-    UserMiddlewares.validateUserExists,
-    UserMiddlewares.userCantChangeRole,
-    CommonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
-    UserMiddlewares.validateEmailUpdate,
+    bodyValidationMiddleware.validateBodyFieldsErrors,
+    userMiddlewares.validateUserExists,
+    userMiddlewares.userCantChangeRole,
+    commonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
+    userMiddlewares.validateEmailUpdate,
   ],
   UserController.updateUser,
 )
@@ -61,11 +59,11 @@ router.put(
 router.delete(
   '/:id',
   [
-    JwtMiddlewares.validJWTNeeded,
+    jwtMiddlewares.validJWTNeeded,
     param('id', 'Invalid ID').isMongoId(),
-    BodyValidationMiddleware.validateBodyFieldsErrors,
-    UserMiddlewares.validateUserExists,
-    CommonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
+    bodyValidationMiddleware.validateBodyFieldsErrors,
+    userMiddlewares.validateUserExists,
+    commonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
   ],
   UserController.deleteUser,
 )

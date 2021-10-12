@@ -1,18 +1,18 @@
 /* eslint-disable no-use-before-define */
-import { Document } from 'mongoose'
+import { Document, Schema } from 'mongoose'
 
-import { IUserDoc } from 'modules/user/interfaces/user.interface'
+import { IUserDoc } from '../../user/interfaces/user.interface'
 
 export interface IRefreshToken {
   user: IUserDoc['_id']
   token: string
-  expires: Date
-  revokedAt: Date
+  expires: Schema.Types.Date
+  revokedAt: Schema.Types.Date
   replacedByToken: string
 }
 
 export interface IRefreshTokenDoc extends IRefreshToken, Document {
-  createdAt: Date
+  createdAt: Schema.Types.Date
   isExpired: boolean
   isActive: boolean
 }

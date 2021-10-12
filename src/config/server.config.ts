@@ -3,7 +3,7 @@ import express, { Application } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import errorMiddleware from '../middlewares/error.middleware'
-import loggerMiddleware from '../middlewares/logger.middleware'
+// import loggerMiddleware from '../middlewares/logger.middleware'
 
 import DB from './db.config'
 import config from './values.config'
@@ -11,6 +11,7 @@ import config from './values.config'
 import { CommonRoutesConfig } from '../modules/common/common.routes.config'
 import { UserRoutes } from '../modules/user/user.routes.config'
 import { AuthRoutes } from '../modules/auth/auth.routes.config'
+import { FileRoutes } from '../modules/file/file.routes.config'
 
 class Server {
   private app: Application
@@ -39,11 +40,12 @@ class Server {
   configRoutes(): void {
     this.routes.push(new UserRoutes(this.app))
     this.routes.push(new AuthRoutes(this.app))
+    this.routes.push(new FileRoutes(this.app))
   }
 
   configMiddlewares(): void {
     // Simple Logging
-    this.app.use(loggerMiddleware)
+    // this.app.use(loggerMiddleware)
     // CORS
     this.app.use(cors())
     // CookieParse

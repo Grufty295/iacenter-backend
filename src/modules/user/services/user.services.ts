@@ -67,7 +67,10 @@ class UsersServices {
     return existingUserWithPassword
   }
 
-  async updateUserById(id: string, user: IUpdateUserInput): Promise<IUserDoc> {
+  async updateUserById(
+    id: string,
+    user: IUpdateUserInput,
+  ): Promise<IUserDoc | null> {
     const existingUser = await UserModel.findByIdAndUpdate({ _id: id }, user, {
       new: true,
     }).exec()
@@ -75,7 +78,7 @@ class UsersServices {
     return existingUser
   }
 
-  async deleteUserById(id: string): Promise<IUserDoc> {
+  async deleteUserById(id: string): Promise<IUserDoc | null> {
     const existingUser = await UserModel.findByIdAndUpdate(
       id,
       { state: false },
