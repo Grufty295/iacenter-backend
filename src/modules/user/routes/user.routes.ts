@@ -24,6 +24,7 @@ router.get(
 router.post(
   '/',
   [
+    jwtMiddlewares.validJWTNeeded,
     body('name', 'User name is required').notEmpty(),
     body('password', 'User password must be at least 8 characters')
       .isLength({
@@ -32,6 +33,7 @@ router.post(
       .trim(),
     body('email', 'Invalid email').isEmail(),
     bodyValidationMiddleware.validateBodyFieldsErrors,
+    commonRoleMiddleware.validateSpecificRoleRequired(Roles.ADMIN_ROLE),
     userMiddlewares.validateSameEmailDoesntExists,
     commonRoleMiddleware.validateRoleExists,
   ],
@@ -44,7 +46,6 @@ router.put(
     jwtMiddlewares.validJWTNeeded,
     param('id', 'Invalid ID').isMongoId(),
     body('name', 'Invalid User name').not().isNumeric().optional(),
-    body('password', 'User cant change their password').isEmpty(),
     body('email', 'Invalid email').isEmail().optional(),
     body('role', 'Invalid role').isString().optional(),
     bodyValidationMiddleware.validateBodyFieldsErrors,

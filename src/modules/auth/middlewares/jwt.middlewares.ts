@@ -1,3 +1,8 @@
+import {
+  HttpException,
+  UnauthenticatedException,
+  ForbiddenException,
+} from '../../../exceptions'
 import { Request, Response, NextFunction } from 'express'
 
 import config from '../../../config/values.config'
@@ -11,17 +16,18 @@ class JwtMiddlewares {
         const authorization = req.headers.authorization.split(' ')
 
         if (authorization[0] !== 'Bearer') {
-          return res.status(401).send()
+          return next(new UnauthenticatedException())
         } else {
           res.locals.jwt = JwtServices.verifyJWT(authorization[1])
 
-          next()
+          return next()
         }
       } catch (err: unknown) {
-        return res.status(403).json({ err })
+        if (err instanceof HttpException)
+          return res.status(err.status).json({ error: err.message })
       }
     } else {
-      return res.status(401).send()
+      throw new UnauthenticatedException()
     }
   }
 
@@ -32,14 +38,12 @@ class JwtMiddlewares {
           req.headers.refreshtoken as string,
           config.JWT_REFRESH_SECRET,
         )
-        next()
+        return next()
       } catch (err: unknown) {
-        console.log(err)
-
-        return res.status(403).json({ msg: 'bad verification' })
+        return next(new ForbiddenException())
       }
     } else {
-      return res.status(401).send()
+      return next(new UnauthenticatedException())
     }
   }
 }

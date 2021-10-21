@@ -11,8 +11,8 @@ class Multer {
     filename: (req, file, cb) => {
       cb(
         null,
-        `${new Date().toUTCString()}_${
-          file.originalname.split('.')[0]
+        `${new Date().toUTCString().replace(/\s/g, '')}_${
+          file.originalname.replace(/\s/g, '').split('.')[0]
         }${path.extname(file.originalname)}`,
       )
     },

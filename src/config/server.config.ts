@@ -2,8 +2,7 @@ import express, { Application } from 'express'
 
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import errorMiddleware from '../middlewares/error.middleware'
-// import loggerMiddleware from '../middlewares/logger.middleware'
+import path from 'path'
 
 import DB from './db.config'
 import config from './values.config'
@@ -44,8 +43,6 @@ class Server {
   }
 
   configMiddlewares(): void {
-    // Simple Logging
-    // this.app.use(loggerMiddleware)
     // CORS
     this.app.use(cors())
     // CookieParse
@@ -53,9 +50,7 @@ class Server {
     // BodyParse
     this.app.use(express.json())
     // Public Folder
-    this.app.use(express.static('public'))
-    // Simple Error Handling
-    this.app.use(errorMiddleware)
+    this.app.use('/public', express.static(path.resolve('public')))
   }
 
   listen(): void {

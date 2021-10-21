@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 
+import { HttpException } from '../../../exceptions'
+
 import config from '../../../config/values.config'
 
 import { IUserDoc } from '../../user/interfaces/user.interface'
 
-import AuthServices from '../services/auth.services'
 import CryptographyServices from '../../common/services/cryptography.services'
 import JwtServices from '../services/jwt.services'
 import UserServices from '../../user/services/user.services'
@@ -26,20 +27,55 @@ class AuthController {
       )
 
       return res.status(200).json({
-        user: {
-          id: user.id,
-          name: user.name,
-          role: user.role,
-        },
+        id: user.id,
+        name: user.name,
+        role: user.role,
+
         token,
         refreshToken,
       })
     } catch (err: unknown) {
-      console.log(err)
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
+    }
+  }
 
+  async signup(req: Request, res: Response) {
+    try {
+      req.body.password = await CryptographyServices.encrypt(req.body.password)
+
+      const { name, email, password, role } = req.body
+
+      await UserServices.addUser({
+        name,
+        email,
+        password,
+        role,
+      })
+
+      const user = await UserServices.getUserByEmail(email)
+
+      const token = JwtServices.generateJWT(user.id, user.email, user.role)
+      const refreshToken = JwtServices.generateJWT(
+        user.id,
+        user.email,
+        user.role,
+        config.JWT_REFRESH_SECRET,
+        config.JWT_REFRESH_EXPIRATION,
+      )
+
+      return res.status(200).json({
+        id: user.id,
+        name: user.name,
+        role: user.role,
+
+        token,
+        refreshToken,
+      })
+    } catch (err: unknown) {
       return res
         .status(500)
-        .json({ error: 'Something went wrong, talk to the administrator' })
+        .json({ error: 'Something went wrong, talk to de administrator' })
     }
   }
 
@@ -68,40 +104,6 @@ class AuthController {
 
     const token = JwtServices.generateJWT(user.id, user.email, user.role)
     return res.status(200).json({ token })
-  }
-
-  async changePassword(req: Request, res: Response) {
-    const { email } = res.locals.jwt
-    const { id } = req.params
-    const { oldPassword, newPassword } = req.body
-
-    try {
-      const existingUser = await UserServices.getUserByEmail(email)
-
-      if (existingUser) {
-        const validPassword = await AuthServices.checkIfPasswordsIdenticals(
-          existingUser,
-          oldPassword,
-        )
-
-        if (validPassword) {
-          const hashedPassword = await CryptographyServices.encrypt(newPassword)
-
-          await UserServices.updateUserById(id, { password: hashedPassword })
-
-          return res
-            .status(200)
-            .json({ msg: 'User password succesfully updated' })
-        }
-      }
-
-      return res.status(400).json({ error: 'Invalid email and/or password' })
-    } catch (err: unknown) {
-      console.log(err)
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to the administrator' })
-    }
   }
 }
 

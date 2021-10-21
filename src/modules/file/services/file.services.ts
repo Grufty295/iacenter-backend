@@ -1,6 +1,8 @@
-import fs from 'fs'
-import util from 'util'
-import path from 'path'
+// import fs from 'fs'
+// import util from 'util'
+// import path from 'path'
+
+import { ServerErrorException } from '../../../exceptions/index'
 
 import FileModel from '../models/file.model'
 
@@ -8,6 +10,7 @@ import { CustomLabels, PaginateOptions, PaginateResult } from 'mongoose'
 
 import { ICreateFileInput, IFileDoc } from '../interfaces/file.interface'
 import { IPaginationOptions } from 'modules/common/interfaces/common.paginationOptions.interface'
+import NotFoundException from '../../../exceptions/NotFoundException'
 
 class FilesServices {
   async addFile(file: ICreateFileInput): Promise<IFileDoc> {
@@ -31,22 +34,15 @@ class FilesServices {
         model: 'User',
         path: 'uploadedBy',
         select: 'name',
-        match: { $regex: pagination.query },
       },
     }
 
     let filesList
 
     try {
-      filesList = await FileModel.paginate(
-        { originalName: { $regex: pagination.query, $options: 'i' } },
-        paginationOptions,
-      )
+      filesList = await FileModel.paginate({}, paginationOptions)
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.log(err)
-        throw new Error(err.message)
-      }
+      throw new ServerErrorException()
     }
 
     return filesList
@@ -57,22 +53,22 @@ class FilesServices {
       const existingUser = await FileModel.findById({ _id: id }).orFail().exec()
       return existingUser
     } catch (err: unknown) {
-      throw new Error('Not found any file')
+      throw new NotFoundException('File')
     }
   }
 
-  async deleteFileById(id: string): Promise<IFileDoc | null> {
-    const existingFile = await FileModel.findByIdAndDelete(id, {
-      new: true,
-    }).exec()
+  // async deleteFileById(id: string): Promise<IFileDoc | null> {
+  //   const existingFile = await FileModel.findByIdAndDelete(id, {
+  //     new: true,
+  //   }).exec()
 
-    if (existingFile) {
-      const unlink = util.promisify(fs.unlink)
-      await unlink(path.resolve(existingFile.path))
-    }
+  //   if (existingFile) {
+  //     const unlink = util.promisify(fs.unlink)
+  //     await unlink(path.resolve(existingFile.path))
+  //   }
 
-    return existingFile
-  }
+  //   return existingFile
+  // }
 }
 
 export default new FilesServices()

@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken'
 import config from '../../../config/values.config'
+import {
+  UnauthenticatedException,
+  ServerErrorException,
+} from '../../../exceptions'
 
 class JwtServices {
   generateJWT(
@@ -18,7 +22,7 @@ class JwtServices {
 
       return token
     } catch (err: unknown) {
-      console.log(err)
+      throw new ServerErrorException()
     }
   }
 
@@ -26,7 +30,7 @@ class JwtServices {
     try {
       return jwt.verify(token, secret as string)
     } catch (err: unknown) {
-      throw Error()
+      throw new UnauthenticatedException()
     }
   }
 }

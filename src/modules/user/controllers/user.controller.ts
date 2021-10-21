@@ -2,26 +2,30 @@
 
 import { Request, Response } from 'express'
 
-// import { IUserDoc } from '../interfaces/user.interface'
+import { HttpException } from '../../../exceptions'
 
 import CryptographyServices from '../../common/services/cryptography.services'
 import UserServices from '../services/user.services'
 
 class UserController {
   async getAllUsers(req: Request, res: Response) {
-    const { limit = 5, page = 1, query = '' } = req.query
+    const { limit = 5, query = '', sort = 'name:1', offset = 0 } = req.query
+
+    const sortParts = sort as string
+
+    const [sortField, sortOrder] = sortParts.split(':')
 
     try {
       const users = await UserServices.getUsers({
         limit: limit as number,
-        page: page as number,
+        sort: { [sortField]: sortOrder },
+        offset: offset as number,
         query: query as string,
       })
       res.status(200).json(users)
     } catch (err: unknown) {
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to de administrator' })
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 
@@ -40,9 +44,8 @@ class UserController {
 
       return res.status(201).json({ msg: 'User regsitration was succesfull' })
     } catch (err: unknown) {
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to de administrator' })
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 
@@ -60,9 +63,9 @@ class UserController {
 
       return res.json(updatedUser)
     } catch (err: unknown) {
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to de administrator' })
+      console.log(err)
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 
@@ -74,9 +77,8 @@ class UserController {
 
       res.json({ msg: 'User was succesfully deleted' })
     } catch (err: unknown) {
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to de administrator' })
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 }

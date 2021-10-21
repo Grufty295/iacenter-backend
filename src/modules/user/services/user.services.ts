@@ -28,8 +28,9 @@ class UsersServices {
     }
     const paginationOptions: PaginateOptions = {
       limit: pagination.limit,
-      page: pagination.page,
       customLabels: paginationCustomLabes,
+      sort: pagination.sort,
+      offset: pagination.offset,
     }
 
     const condition: FilterQuery<IUserDoc> = {
@@ -55,12 +56,15 @@ class UsersServices {
   }
 
   async getUserByEmail(email: string): Promise<IUserDoc> {
-    const existingUser = await UserModel.findOne({ email }).exec()
+    const existingUser = await UserModel.findOne({ email, state: true }).exec()
     return existingUser as IUserDoc
   }
 
   async getUserByEmailWithPassword(email: string): Promise<IUserDoc> {
-    const existingUserWithPassword = await UserModel.findOne({ email })
+    const existingUserWithPassword = await UserModel.findOne({
+      email,
+      state: true,
+    })
       .select('_id email role password')
       .orFail()
       .exec()

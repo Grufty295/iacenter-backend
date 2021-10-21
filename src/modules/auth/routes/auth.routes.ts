@@ -1,12 +1,13 @@
 import { Router } from 'express'
-import { body, param } from 'express-validator'
+import { body } from 'express-validator'
 
 import AuthController from '../controllers/auth.controller'
 
-import AuthMiddlewares from '../middlewares/auth.middlewares'
-import BodyValidationMiddleware from '../../common/middlewares/body.validation.middleware'
-import CommonRoleMiddleware from '../../common/middlewares/common.role.middleware'
-import JwtMiddlewares from '../middlewares/jwt.middlewares'
+import authMiddlewares from '../middlewares/auth.middlewares'
+import bodyValidationMiddleware from '../../common/middlewares/body.validation.middleware'
+import commonRoleMiddleware from '../../common/middlewares/common.role.middleware'
+import jwtMiddlewares from '../middlewares/jwt.middlewares'
+import userMiddlewares from '../../user/middlewares/user.middlewares'
 
 const router = Router()
 
@@ -15,33 +16,33 @@ router.post(
   [
     body('email', 'Invalid email').isEmail(),
     body('password', 'User password is required').notEmpty(),
-    BodyValidationMiddleware.validateBodyFieldsErrors,
-    AuthMiddlewares.verifyUserPassword,
+    bodyValidationMiddleware.validateBodyFieldsErrors,
+    authMiddlewares.verifyUserPassword,
   ],
   AuthController.login,
 )
 
 router.post(
-  '/renew',
-  [JwtMiddlewares.validRefreshNeeded],
-  AuthController.refreshToken,
-)
-
-router.put(
-  '/change-password/:id',
+  '/signup',
   [
-    JwtMiddlewares.validJWTNeeded,
-    param('id', 'Invalid ID').isMongoId(),
-    body('oldPassword', 'The actual password is required').notEmpty(),
-    body('newPassword', 'User password must be at least 8 characters')
+    body('name', 'User name is required').notEmpty(),
+    body('password', 'User password must be at least 8 characters')
       .isLength({
         min: 8,
       })
       .trim(),
-    BodyValidationMiddleware.validateBodyFieldsErrors,
-    CommonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
+    body('email', 'Invalid email').isEmail(),
+    bodyValidationMiddleware.validateBodyFieldsErrors,
+    userMiddlewares.validateSameEmailDoesntExists,
+    commonRoleMiddleware.validateRoleExists,
   ],
-  AuthController.changePassword,
+  AuthController.signup,
+)
+
+router.post(
+  '/renew',
+  [jwtMiddlewares.validRefreshNeeded],
+  AuthController.refreshToken,
 )
 
 export default router
