@@ -37,6 +37,7 @@ class Multer {
   public upload = multer({
     storage: this.multerStorageConfig,
     fileFilter: this.multerFilterConfig,
+    limits: { fileSize: 10 * 1024 * 1024, files: 12 },
   })
 }
 

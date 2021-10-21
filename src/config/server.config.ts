@@ -44,7 +44,11 @@ class Server {
 
   configMiddlewares(): void {
     // CORS
-    this.app.use(cors())
+    this.app.use(
+      cors({
+        origin: '*',
+      }),
+    )
     // CookieParse
     this.app.use(cookieParser())
     // BodyParse
