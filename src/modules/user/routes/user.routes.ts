@@ -52,6 +52,7 @@ router.put(
     userMiddlewares.validateUserExists,
     userMiddlewares.userCantChangeRole,
     commonRoleMiddleware.validateOnlySameUserOrAdminCanMakeThisAction,
+    commonRoleMiddleware.validateRoleExists,
     userMiddlewares.validateEmailUpdate,
   ],
   UserController.updateUser,

@@ -20,11 +20,7 @@ class UserMiddlewares {
       const userWithExistingEmail = await UserServices.getUserByEmail(
         req.body.email,
       )
-      if (
-        !userWithExistingEmail ||
-        userWithExistingEmail.name === res.locals.jwt?.name ||
-        res.locals.jwt?.role === Roles.ADMIN_ROLE
-      ) {
+      if (!userWithExistingEmail) {
         return next()
       } else {
         return res
@@ -62,10 +58,25 @@ class UserMiddlewares {
     res: Response,
     next: NextFunction,
   ) => {
-    if (req.body.email) {
-      return await this.validateSameEmailDoesntExists(req, res, next)
-    } else {
-      return next()
+    try {
+      const userWithExistingEmail = await UserServices.getUserByEmail(
+        req.body.email,
+      )
+      if (
+        !userWithExistingEmail ||
+        userWithExistingEmail.name === res.locals.jwt?.name ||
+        res.locals.jwt?.role === Roles.ADMIN_ROLE
+      ) {
+        return next()
+      } else {
+        return res
+          .status(400)
+          .send('This email is already connected to an account')
+      }
+    } catch (err: unknown) {
+      console.log(err)
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 
