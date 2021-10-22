@@ -30,10 +30,10 @@ class UserController {
   }
 
   async addUser(req: Request, res: Response) {
+    const { name, email, password, role } = req.body
+
     try {
       req.body.password = await CryptographyServices.encrypt(req.body.password)
-
-      const { name, email, password, role } = req.body
 
       await UserServices.addUser({
         name,
@@ -42,7 +42,7 @@ class UserController {
         role,
       })
 
-      return res.status(201).json({ msg: 'User regsitration was succesfull' })
+      return res.status(201).json({ msg: 'User registration was succesfull' })
     } catch (err: unknown) {
       if (err instanceof HttpException)
         return res.status(err.status).json({ error: err.message })
@@ -55,7 +55,6 @@ class UserController {
 
     try {
       if (password) {
-        // Encrypt password
         rest.password = await CryptographyServices.encrypt(password)
       }
 

@@ -6,8 +6,6 @@ import {
   NotFoundException,
 } from '../../../exceptions'
 
-import { IUserDoc } from '../interfaces/user.interface'
-
 import { Roles } from '../../common/interfaces/common.role.enum'
 
 import UserServices from '../services/user.services'
@@ -18,13 +16,14 @@ class UserMiddlewares {
     res: Response,
     next: NextFunction,
   ) {
-    let userWithExistingEmail: IUserDoc
     try {
-      userWithExistingEmail = await UserServices.getUserByEmail(req.body.email)
+      const userWithExistingEmail = await UserServices.getUserByEmail(
+        req.body.email,
+      )
       if (
         !userWithExistingEmail ||
-        userWithExistingEmail.name === res.locals.jwt.name ||
-        res.locals.jwt.role === Roles.ADMIN_ROLE
+        userWithExistingEmail.name === res.locals.jwt?.name ||
+        res.locals.jwt?.role === Roles.ADMIN_ROLE
       ) {
         return next()
       } else {
@@ -33,6 +32,7 @@ class UserMiddlewares {
           .send('This email is already connected to an account')
       }
     } catch (err: unknown) {
+      console.log(err)
       if (err instanceof HttpException)
         return res.status(err.status).json({ error: err.message })
     }
