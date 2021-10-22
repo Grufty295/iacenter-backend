@@ -33,12 +33,12 @@ class UserController {
     const { name, email, password, role } = req.body
 
     try {
-      req.body.password = await CryptographyServices.encrypt(req.body.password)
+      const hashedpass = await CryptographyServices.encrypt(password)
 
       await UserServices.addUser({
         name,
         email,
-        password,
+        password: hashedpass,
         role,
       })
 

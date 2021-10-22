@@ -18,6 +18,7 @@ import { IPaginationOptions } from 'modules/common/interfaces/common.paginationO
 class UsersServices {
   async addUser(user: ICreateUserInput): Promise<IUserDoc> {
     const newUser: IUserDoc = new UserModel(user)
+
     try {
       await newUser.save()
     } catch (err: unknown) {
