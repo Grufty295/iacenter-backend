@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import config from '../../../config/values.config'
 import {
-  UnauthenticatedException,
   ServerErrorException,
+  ExpiredTokenException,
 } from '../../../exceptions'
 
 class JwtServices {
@@ -30,7 +30,7 @@ class JwtServices {
     try {
       return jwt.verify(token, secret as string)
     } catch (err: unknown) {
-      throw new UnauthenticatedException()
+      throw new ExpiredTokenException()
     }
   }
 }

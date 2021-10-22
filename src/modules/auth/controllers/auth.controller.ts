@@ -41,10 +41,9 @@ class AuthController {
   }
 
   async signup(req: Request, res: Response) {
+    const { name, email, password, role } = req.body
     try {
       req.body.password = await CryptographyServices.encrypt(req.body.password)
-
-      const { name, email, password, role } = req.body
 
       await UserServices.addUser({
         name,
@@ -73,23 +72,21 @@ class AuthController {
         refreshToken,
       })
     } catch (err: unknown) {
-      return res
-        .status(500)
-        .json({ error: 'Something went wrong, talk to de administrator' })
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
     }
   }
 
   async refreshToken(req: Request, res: Response) {
     const refreshToken = req.headers.refreshtoken as string
-    let user: IUserDoc
-
-    if (!refreshToken) {
-      return res
-        .status(400)
-        .json({ msg: 'Something went wrong, refresh token is required' })
-    }
 
     try {
+      if (!refreshToken) {
+        return res
+          .status(400)
+          .json({ msg: 'Something went wrong, refresh token is required' })
+      }
+
       const verifiedRefreshToken = JwtServices.verifyJWT(
         refreshToken,
         config.JWT_REFRESH_SECRET,
@@ -97,13 +94,15 @@ class AuthController {
 
       const { email } = verifiedRefreshToken as IUserDoc
 
-      user = await UserServices.getUserByEmail(email)
-    } catch (err: unknown) {
-      return res.status(400).json({ msg: 'Something went wrong, Invalid user' })
-    }
+      const user = await UserServices.getUserByEmail(email)
 
-    const token = JwtServices.generateJWT(user.id, user.email, user.role)
-    return res.status(200).json({ token })
+      const token = JwtServices.generateJWT(user.id, user.email, user.role)
+
+      return res.status(200).json({ token })
+    } catch (err: unknown) {
+      if (err instanceof HttpException)
+        return res.status(err.status).json({ error: err.message })
+    }
   }
 }
 

@@ -2,7 +2,7 @@ import HttpException from './BaseHttpException'
 
 class UnauthenticatedException extends HttpException {
   constructor() {
-    super(401, `User authentication failed`)
+    super(401, `Unauthenticated user`)
   }
 }
 
