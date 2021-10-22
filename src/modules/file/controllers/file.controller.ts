@@ -47,18 +47,6 @@ class FileController {
 
     return res.status(201).json({ msg: 'File/s successfully uploaded' })
   }
-
-  // async deleteFile(req: Request, res: Response) {
-  //   const { id } = req.params
-  //   try {
-  //     await fileServices.deleteFileById(id)
-  //     res.json({ msg: 'File was succesfully deleted' })
-  //   } catch (err: unknown) {
-  //     return res
-  //       .status(500)
-  //       .json({ error: 'Something went wrong, talk to de administrator' })
-  //   }
-  // }
 }
 
 export default new FileController()

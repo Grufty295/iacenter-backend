@@ -62,7 +62,6 @@ class UserController {
 
       return res.json(updatedUser)
     } catch (err: unknown) {
-      console.log(err)
       if (err instanceof HttpException)
         return res.status(err.status).json({ error: err.message })
     }

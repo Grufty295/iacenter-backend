@@ -1,7 +1,3 @@
-// import fs from 'fs'
-// import util from 'util'
-// import path from 'path'
-
 import { ServerErrorException } from '../../../exceptions/index'
 
 import FileModel from '../models/file.model'
@@ -56,19 +52,6 @@ class FilesServices {
       throw new NotFoundException('File')
     }
   }
-
-  // async deleteFileById(id: string): Promise<IFileDoc | null> {
-  //   const existingFile = await FileModel.findByIdAndDelete(id, {
-  //     new: true,
-  //   }).exec()
-
-  //   if (existingFile) {
-  //     const unlink = util.promisify(fs.unlink)
-  //     await unlink(path.resolve(existingFile.path))
-  //   }
-
-  //   return existingFile
-  // }
 }
 
 export default new FilesServices()

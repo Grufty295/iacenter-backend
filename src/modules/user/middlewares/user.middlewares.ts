@@ -25,10 +25,9 @@ class UserMiddlewares {
       } else {
         return res
           .status(400)
-          .send('This email is already connected to an account')
+          .send({ error: 'This email is already connected to an account' })
       }
     } catch (err: unknown) {
-      console.log(err)
       if (err instanceof HttpException)
         return res.status(err.status).json({ error: err.message })
     }
@@ -46,7 +45,6 @@ class UserMiddlewares {
     if (res.locals.jwt.role === Roles.ADMIN_ROLE) return next()
 
     if (req.body.role && req.body.role !== res.locals.jwt.role) {
-      // return res.status(403).json({ error: 'User cant change their role' })
       return next(new ForbiddenException())
     } else {
       return next()
@@ -74,7 +72,6 @@ class UserMiddlewares {
           .send('This email is already connected to an account')
       }
     } catch (err: unknown) {
-      console.log(err)
       if (err instanceof HttpException)
         return res.status(err.status).json({ error: err.message })
     }
@@ -86,9 +83,6 @@ class UserMiddlewares {
       next()
     } else {
       next(new NotFoundException('User'))
-      // return res
-      //   .status(404)
-      //   .send({ error: `The user with ID: ${req.params.id} not found` })
     }
   }
 }

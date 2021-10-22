@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  UnauthenticatedException,
-  // ForbiddenException,
-} from '../../../exceptions'
+import { HttpException, UnauthenticatedException } from '../../../exceptions'
 import { Request, Response, NextFunction } from 'express'
 
 import config from '../../../config/values.config'

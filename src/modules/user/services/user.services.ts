@@ -1,4 +1,7 @@
 import UserModel from '../models/user.model'
+
+import DuplicatedResourceException from '../../../exceptions/DuplicatedResourceErrorException'
+
 import {
   CustomLabels,
   PaginateOptions,
@@ -18,7 +21,7 @@ class UsersServices {
     try {
       await newUser.save()
     } catch (err: unknown) {
-      console.log(err)
+      throw new DuplicatedResourceException()
     }
     return newUser
   }
@@ -60,7 +63,10 @@ class UsersServices {
   }
 
   async getUserByEmail(email: string): Promise<IUserDoc> {
-    const existingUser = await UserModel.findOne({ email, state: true }).exec()
+    const existingUser = await UserModel.findOne({
+      email,
+      state: true,
+    }).exec()
     return existingUser as IUserDoc
   }
 

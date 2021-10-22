@@ -27,7 +27,6 @@ class AuthMiddlewares {
       }
       return res.status(400).json('Invalid email and/or password')
     } catch (err: unknown) {
-      console.log(err)
       return res
         .status(500)
         .json({ error: 'Something went wrong, talk to the administrator' })
